@@ -12,17 +12,20 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import scipy.sparse as spr
+from typing import Union
 
 # path names:
 path_control = 'RawData/index.xlsx'
 path_field_predicted_knn = 'Outputs/FieldPredictedKNN'
 path_field_predicted_nn = 'Outputs/FieldPredictedNN'
 path_field_predicted_dt = 'Outputs/FieldPredictedDT'
+path_svm_field_predicted = 'Outputs/FieldPredictedSVM'
 
 # save path:
 path_plot3d_knn = 'Outputs/Plot3dKNN.png'
 path_plot3d_nn = 'Outputs/Plot3dNN.png'
 path_plot3d_dt = 'Outputs/Plot3dDT.png'
+path_plot3d_svm = 'Outputs/Plot3dSVM.png'
 
 
 def ReconstructToOrigin(PowerRaw: np.ndarray, numGrid: int, numSection: int, numGridQuarter: int, lstGridControl: list,
@@ -255,14 +258,14 @@ def plot3D():
     ax.set_zlabel('Z')
 
 
-def TestdataIAEA(data_path: str, pathControl, pathSave):
+def TestdataIAEA(data_path: Union[str, np.ndarray], pathControl, pathSave):
     numLength = 15
     numWidth = 15
     numGrid = 177
     numSection = 28
     rangeUtile = [[88, 96], [103, 111], [118, 126], [132, 139], [145, 152], [157, 163], [167, 172], [174, 177]]
 
-    def reactorPlot3D(pathControl: str, data_path: str, numLength: int, numWidth: int, numGrid: int,
+    def reactorPlot3D(pathControl: str, data_path: Union[str, np.ndarray], numLength: int, numWidth: int, numGrid: int,
                       numSection: int):
         '''
         Plot the 3Dheatmap of the whole reactor.
@@ -277,7 +280,11 @@ def TestdataIAEA(data_path: str, pathControl, pathSave):
         :return:
         '''
         # The final data is in shape of (numGrid,numSection)
-        data = np.loadtxt(data_path)
+        if isinstance(data_path, str):
+            data = np.loadtxt(data_path)
+        else:
+            data = np.squeeze(data_path)
+        
         data = ReconstructToOrigin(data, numGrid=177, numSection=28, numGridQuarter=52,
                                 lstGridControl=[8, 8, 8, 7, 7, 6, 5, 3],
                                 rangeUtile=rangeUtile, choice='((numSection) * numGrid)')
@@ -348,5 +355,7 @@ def plot_result(choice:str):
         TestdataIAEA(data_path=path_field_predicted_nn, pathControl=path_control, pathSave=path_plot3d_nn)
     elif choice == 'dt':
         TestdataIAEA(data_path=path_field_predicted_dt, pathControl=path_control, pathSave=path_plot3d_dt)
+    elif choice == 'svm':
+        TestdataIAEA(data_path=path_svm_field_predicted, pathControl=path_control, pathSave=path_plot3d_svm)
     else:
         raise ValueError('Your choice is not in the available set!')

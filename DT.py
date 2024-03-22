@@ -8,9 +8,11 @@
 # Input: Parameter/Observation
 # Output: State/BestParameter
 
+'''
 import numpy as np
 import joblib
 from sklearn.tree import DecisionTreeRegressor
+from sklearn.metrics import mean_squared_error
 
 # input path control
 path_mu_train = 'DataPrepro/muTrain.txt'
@@ -41,6 +43,10 @@ obs_test = alpha_test @ basis.T @ sensors.T
 def trainDT():
     model = DecisionTreeRegressor(max_depth=30, min_samples_leaf=1, min_samples_split=2)
     model.fit(mu_train_nor, alpha_train)
+
+    predict = model.predict(mu_test_nor)
+    print(mean_squared_error(alpha_test, predict))
+
     joblib.dump(model, path_dt_model_for)
 
     model = DecisionTreeRegressor(max_depth=30, min_samples_leaf=1, min_samples_split=2)
@@ -62,3 +68,17 @@ def predictDT(num_test):
 
     Mu_predicted = dt_model_inv.predict(obs_test[num_test, :].reshape(1, -1)) @ np.linalg.pinv(scalingNor)
     np.savetxt(path_mu_predicted, Mu_predicted)
+'''
+
+from basemodel import RODTModel
+from sklearn.tree import DecisionTreeRegressor
+
+class DTModel(RODTModel):
+    def __init__(self) -> None:
+        super().__init__("DT")
+
+    def _get_model_for(self):
+        return DecisionTreeRegressor(max_depth=30, min_samples_leaf=1, min_samples_split=2)
+
+    def _get_model_inv(self):
+        return DecisionTreeRegressor(max_depth=30, min_samples_leaf=1, min_samples_split=2)

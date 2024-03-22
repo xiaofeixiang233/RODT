@@ -1,3 +1,4 @@
+'''
 import numpy as np
 import joblib
 from sklearn.tree import DecisionTreeRegressor
@@ -63,3 +64,25 @@ def predictGBDT(num_test=10):
 
     Mu_predicted = model_inv.predict(obs_test[num_test, :].reshape(1, -1)) @ np.pinv(scalingNor)
     np.savetxt(path_mu_predicted, Mu_predicted)
+'''
+
+from basemodel import RODTModel
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.multioutput import MultiOutputRegressor
+from sklearn.ensemble import GradientBoostingRegressor
+
+class GBDTModel(RODTModel):
+    def __init__(self) -> None:
+        super().__init__("GBDT")
+        self.params_for={'n_estimators': 108, 'subsample': 0.35, 'max_depth': 48, 'learning_rate': 0.064, 
+                         'min_samples_leaf': 1, 'min_samples_split': 2, 'random_state': 42}
+        self.params_inv={'n_estimators': 108, 'subsample': 0.35, 'max_depth': 49, 'learning_rate': 0.060000000000000005, 
+                         'min_samples_leaf': 1, 'min_samples_split': 2, 'random_state': 42}
+
+    def _get_model_for(self):
+        model = GradientBoostingRegressor(**self.params_for)
+        return MultiOutputRegressor(model)
+
+    def _get_model_inv(self):
+        model = GradientBoostingRegressor(**self.params_inv)
+        return MultiOutputRegressor(model)

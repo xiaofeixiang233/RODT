@@ -7,8 +7,7 @@
 # @Lab: AISEA PLATFORM
 # Input: Parameter/Observation
 # Output: State/BestParameter
-
-
+'''
 import numpy as np
 import joblib
 from sklearn.neighbors import KNeighborsRegressor
@@ -73,3 +72,20 @@ def predictKNN(num_test=10):
 
     Mu_predicted = knn_model_inv.predict(obs_test[num_test, :].reshape(1, -1)) @ np.linalg.pinv(scalingNor)
     np.savetxt(path_mu_predicted, Mu_predicted)
+'''
+
+from basemodel import RODTModel
+from sklearn.neighbors import KNeighborsRegressor
+
+class KNNModel(RODTModel):
+    def __init__(self) -> None:
+        super().__init__("KNN")
+        self.p = 2
+        self.k_for = 5
+        self.k_inv = 1
+
+    def _get_model_for(self):
+        return KNeighborsRegressor(n_neighbors=self.k_for, weights='distance', p=self.p, metric='minkowski')
+
+    def _get_model_inv(self):
+        return KNeighborsRegressor(n_neighbors=self.k_inv, weights='distance', p=self.p, metric='minkowski')
