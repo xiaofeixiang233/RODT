@@ -1,3 +1,4 @@
+'''
 import numpy as np
 import joblib
 from sklearn.tree import DecisionTreeRegressor
@@ -78,3 +79,39 @@ def predictAdaboost(num_test=10):
 
     Mu_predicted = model_inv.predict(obs_test[num_test, :].reshape(1, -1)) @ np.pinv(scalingNor)
     np.savetxt(path_mu_predicted, Mu_predicted)
+'''
+
+from basemodel import RODTModel
+import numpy as np
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import AdaBoostRegressor
+from sklearn.multioutput import MultiOutputRegressor
+
+class AdaboostModel(RODTModel):
+    def __init__(self):
+        super().__init__("Adaboost")
+    
+    def _get_model_for(self):
+        model=DecisionTreeRegressor(
+            max_depth=28,
+            min_samples_leaf=1,
+            min_samples_split=4,
+            random_state=968)
+        model = AdaBoostRegressor(estimator=model,
+                                n_estimators=150,
+                                learning_rate=0.385,
+                                loss='square')
+        return MultiOutputRegressor(model,n_jobs=5)
+
+    def _get_model_inv(self):
+        model=DecisionTreeRegressor(
+            max_depth=99,
+            min_samples_leaf=1,
+            min_samples_split=3,
+            random_state=42)
+        model = AdaBoostRegressor(estimator=model,
+                                n_estimators=150,
+                                learning_rate=0.385,
+                                loss='square')
+        return MultiOutputRegressor(model,n_jobs=5)
+    

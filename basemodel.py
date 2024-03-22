@@ -5,11 +5,10 @@ from sklearn.metrics import mean_squared_error
 from UI import TestdataIAEA
 from typing import Union
 
-def load_file(dir, name):
-    path = os.path.join(dir, name)
+def load_file(path):
     if not os.path.exists(path):
         raise FileNotFoundError(f"file {path} not found")
-    return np.loadtxt(path, name)
+    return np.loadtxt(path)
 
 def load_model(path):
     if not os.path.exists(path):
@@ -128,7 +127,7 @@ class RODTModel:
         if self.model_inv is None:
             raise ValueError("model_inv not load")
         if isinstance(scaling_norm, str):
-            scaling_norm = load_file(os.path.join(os.getcwd(), scaling_norm))
+            scaling_norm = load_file(os.path.join(os.getcwd(), scaling_norm))    
 
         output_path = to_abs_path(output_dir)
         output_path = os.path.join(output_path, self.name)

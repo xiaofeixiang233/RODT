@@ -17,6 +17,7 @@ from DT import DTModel
 from KNN import KNNModel
 from GBDT import GBDTModel
 from SVM import SVMModel
+from Adaboost import AdaboostModel
 import numpy as np
 
 path_mu_train = 'DataPrepro/muTrain.txt'
@@ -70,10 +71,11 @@ if __name__ == '__main__':
 
 
     # ==========================================================================
-    # dt_model = DTModel()
-    # dt_model.train_for(mu_train_nor, alpha_train)
-    # dt_model.eval_for(mu_test_nor, alpha_test)
-    # dt_model.predict_for(mu_test_nor, 10, basis, plot=True)
+    dt_model = DTModel()
+    # dt_model.train_inv(obs_train, mu_train_nor)
+    dt_model.load_model_inv('Models/DT/model_inv_DT.joblib')
+    dt_model.eval_inv(obs_test, mu_test_nor)
+    # dt_model.predict_inv(obs_test, 10, path_scaling_nor, plot=False)
     # ==========================================================================
 
     # ==========================================================================
@@ -83,7 +85,6 @@ if __name__ == '__main__':
     # knn_model.predict_for(mu_test_nor, 10, basis, plot=True)
     # ==========================================================================
 
-
     # ==========================================================================
     # gbdt_model = GBDTModel()
     # gbdt_model.train_for(mu_train_nor, alpha_train)
@@ -91,12 +92,17 @@ if __name__ == '__main__':
     # gbdt_model.predict_for(mu_test_nor, 10, basis, plot=True)
     # ==========================================================================
 
+    # ==========================================================================
+    # svm_model = SVMModel(50, 4)
+    # svm_model.train_for(mu_train_nor, alpha_train)
+    # svm_model.load_model_for('Models/SVM', 'svm_mu_alpha')
+    # svm_model.eval_for(mu_test_nor, alpha_test)
+    # svm_model.predict_for(mu_test_nor, 10, basis, plot=True)
+    # ==========================================================================
     
     # ==========================================================================
-    svm_model = SVMModel(50, 4)
-    svm_model.train_for(mu_train_nor, alpha_train)
-    svm_model.load_model_for('Models/SVM', 'svm_mu_alpha')
-    svm_model.eval_for(mu_test_nor, alpha_test)
-    svm_model.predict_for(mu_test_nor, 10, basis, plot=True)
-    
+    # adaboost_model = AdaboostModel()
+    # adaboost_model.train_for(mu_train_nor, alpha_train)
+    # adaboost_model.eval_for(mu_test_nor, alpha_test)
+    # adaboost_model.predict_for(mu_test_nor, 10, basis, plot=True)
     # ==========================================================================
