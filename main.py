@@ -74,8 +74,9 @@ if __name__ == '__main__':
     dt_model = DTModel()
     # dt_model.train_inv(obs_train, mu_train_nor)
     dt_model.load_model_inv('Models/DT/model_inv_DT.joblib')
-    dt_model.eval_inv(obs_test, mu_test_nor)
-    # dt_model.predict_inv(obs_test, 10, path_scaling_nor, plot=False)
+    # dt_model.eval_inv(obs_test, mu_test_nor)
+    result = dt_model.predict_inv(obs_test[10, :], path_scaling_nor, save_txt=False, plot=False)
+    print(result)
     # ==========================================================================
 
     # ==========================================================================

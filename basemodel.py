@@ -97,8 +97,8 @@ class RODTModel:
         predict = self._predict_inv(eval_data_x)
         print(f'MSE of inverse model of {self.name}: {mean_squared_error(eval_data_y, predict)}')
 
-    def predict_for(self, data, test_index : int, basis : Union[str, np.ndarray], 
-                    output_dir='Outputs', model_path=None, plot=True):
+    def predict_for(self, data, basis : Union[str, np.ndarray], model_path=None, save_txt=True, plot=True,
+                    output_dir='Outputs'):
         if model_path is None:
             model_path = os.path.join(self.model_dir, self.name, f'model_for_{self.name}.joblib')
         if self.model_for is None:
@@ -106,22 +106,25 @@ class RODTModel:
         if isinstance(basis, str):
             basis = load_file(os.path.join(os.getcwd(), basis))        
         
-        output_path = to_abs_path(output_dir)
-        output_path = os.path.join(output_path, self.name)
-        if not os.path.exists(output_path):
-            os.makedirs(output_path)
-        output_path = os.path.join(output_path, f'FieldPredicted_{self.name}.txt')
-        
-        alpha_predicted = self._predict_for(data[test_index, :].reshape(1, -1)).reshape(1, -1)
+        alpha_predicted = self._predict_for(data.reshape(1, -1)).reshape(1, -1)
         field_predicted = alpha_predicted @ basis.T
-        np.savetxt(output_path, field_predicted)
-        print(f'save field prediction to {output_path}')
+
+        if save_txt:
+            output_path = to_abs_path(output_dir)
+            output_path = os.path.join(output_path, self.name)
+            if not os.path.exists(output_path):
+                os.makedirs(output_path)
+            output_path = os.path.join(output_path, f'FieldPredicted_{self.name}.txt')
+            np.savetxt(output_path, field_predicted)
+            print(f'save field prediction to {output_path}')
 
         if plot:
             self.plot3d(field_predicted, save_dir=output_dir)
 
-    def predict_inv(self, data, test_index : int, scaling_norm : Union[str, np.ndarray], 
-                    output_dir='Outputs', model_path=None, plot=True):
+        return np.squeeze(field_predicted)
+
+    def predict_inv(self, data, scaling_norm : Union[str, np.ndarray], model_path=None, save_txt=True, plot=True,
+                    output_dir='Outputs'):
         if model_path is None:
             model_path = os.path.join(self.model_dir, self.name, f'model_inv_{self.name}.joblib')
         if self.model_inv is None:
@@ -129,18 +132,21 @@ class RODTModel:
         if isinstance(scaling_norm, str):
             scaling_norm = load_file(os.path.join(os.getcwd(), scaling_norm))    
 
-        output_path = to_abs_path(output_dir)
-        output_path = os.path.join(output_path, self.name)
-        if not os.path.exists(output_path):
-            os.makedirs(output_path)
-        output_path = os.path.join(output_path, f'MuPredicted_{self.name}.txt')
-        
-        mu_predicted = self._predict_inv(data[test_index, :].reshape(1, -1)).reshape(1, -1) @ np.linalg.pinv(scaling_norm)
-        np.savetxt(output_path, mu_predicted)
-        print(f'save mu prediction to {output_path}')
+        mu_predicted = self._predict_inv(data.reshape(1, -1)).reshape(1, -1) @ np.linalg.pinv(scaling_norm)
 
+        if save_txt:
+            output_path = to_abs_path(output_dir)
+            output_path = os.path.join(output_path, self.name)
+            if not os.path.exists(output_path):
+                os.makedirs(output_path)
+            output_path = os.path.join(output_path, f'MuPredicted_{self.name}.txt')
+            np.savetxt(output_path, mu_predicted)
+            print(f'save mu prediction to {output_path}')
+        
         if plot:
             raise NotImplementedError("plot for inverse prediction not implemented")
+        
+        return np.squeeze(mu_predicted)
     
     def plot3d(self, data : Union[str, np.ndarray], path_control='RawData/index.xlsx', save_dir='Outputs'):
         path_control = to_abs_path(path_control)
